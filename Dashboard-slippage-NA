@@ -1,10 +1,29 @@
 <!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>NA Deal Slippage Intelligence</title>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Filigran — NA Pipeline Slippage</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:system-ui,-apple-system,sans-serif;background:#fff;color:#1a1a1a;padding:20px;max-width:1100px;margin:0 auto}
-h1{font-size:22px;font-weight:700;margin-bottom:4px}
+
+/* ── PASSWORD GATE ── */
+#gate{position:fixed;inset:0;background:#0D1B2A;display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .4s}
+#gate.hidden{opacity:0;pointer-events:none}
+.gate-box{text-align:center;color:#fff;max-width:360px;padding:24px}
+.gate-box h1{font-size:20px;font-weight:700;margin-bottom:4px;font-family:system-ui}
+.gate-box p{font-size:12px;color:#90A4AE;margin-bottom:20px;font-family:system-ui}
+.gate-box input{width:100%;padding:12px 16px;border:2px solid #1E88E5;border-radius:8px;background:#0a1525;color:#fff;font-size:14px;outline:none;font-family:system-ui;text-align:center;letter-spacing:2px}
+.gate-box input:focus{border-color:#42A5F5}
+.gate-box .btn{margin-top:12px;width:100%;padding:12px;background:#1565C0;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:system-ui;transition:background .2s}
+.gate-box .btn:hover{background:#1E88E5}
+.gate-box .err{color:#EF5350;font-size:12px;margin-top:8px;min-height:18px;font-family:system-ui}
+.gate-box .lock{font-size:40px;margin-bottom:12px}
+
+/* ── DASHBOARD ── */
+#dashboard{display:none;font-family:system-ui,-apple-system,sans-serif;background:#fff;color:#1a1a1a;padding:24px;max-width:1100px;margin:0 auto}
+#dashboard.visible{display:block}
+h1.dash{font-size:22px;font-weight:700;margin-bottom:4px}
 .sub{font-size:12px;color:#888;margin-bottom:20px}
 .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
 .kpi{background:#f5f5f5;border-radius:10px;padding:14px;text-align:center}
@@ -31,16 +50,40 @@ tr:nth-child(even){background:#f9f9f9}
 .flag-box{background:#FFF3E0;border-radius:8px;padding:14px;margin-top:16px;border-left:4px solid #E65100}
 .flag-box h3{font-size:13px;margin-bottom:6px;color:#E65100}
 .flag-box p{font-size:11px;color:#555;line-height:1.5}
-</style></head><body>
+.footer{margin-top:30px;padding-top:12px;border-top:1px solid #e0e0e0;font-size:10px;color:#aaa;text-align:center}
 
-<h1>NA Deal Slippage Intelligence</h1>
-<div class="sub">Q1 2025 → Q2 2026 | HubSpot Team: Revenue - NA | 172 pushed deals total | Live data pulled March 27, 2026</div>
+@media(max-width:700px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .chart-row{grid-template-columns:1fr}
+  .bar-row .name{width:100px;font-size:10px}
+  .bar-row .amt{width:80px;font-size:10px}
+}
+</style>
+</head><body>
+
+<!-- ═══ PASSWORD GATE ═══ -->
+<div id="gate">
+<div class="gate-box">
+  <div class="lock">🔒</div>
+  <h1>Filigran RevOps</h1>
+  <p>NA Pipeline Slippage Intelligence — Restricted Access</p>
+  <input type="password" id="pwd" placeholder="Enter access code" autofocus>
+  <button class="btn" onclick="tryAccess()">Unlock</button>
+  <div class="err" id="err"></div>
+</div>
+</div>
+
+<!-- ═══ DASHBOARD (hidden until authenticated) ═══ -->
+<div id="dashboard">
+
+<h1 class="dash">NA Deal Slippage Intelligence</h1>
+<div class="sub">Q1 2025 → Q2 2026 | HubSpot Team: Revenue - NA | 172 pushed deals | Live data: March 27, 2026</div>
 
 <div class="kpi-grid">
   <div class="kpi blue"><div class="label">Total Pushed Deals</div><div class="val">172</div><div class="detail">deal_was_pushed = true (NA)</div></div>
   <div class="kpi"><div class="label">Serial Pushed (2+)</div><div class="val">$7.1M</div><div class="detail">45 deals with detailed data</div></div>
-  <div class="kpi red"><div class="label">Critical + High</div><div class="val">8 deals</div><div class="detail">$1.19M pushed 5-7×</div></div>
-  <div class="kpi amber"><div class="label">Avg Push (serial)</div><div class="val">3.6×</div><div class="detail">benchmark max: 1×</div></div>
+  <div class="kpi red"><div class="label">Critical + High</div><div class="val">8 deals</div><div class="detail">$1.19M pushed 5-7x</div></div>
+  <div class="kpi amber"><div class="label">Avg Push (serial)</div><div class="val">3.6x</div><div class="detail">benchmark max: 1x</div></div>
 </div>
 
 <div class="chart-row">
@@ -50,21 +93,21 @@ tr:nth-child(even){background:#f9f9f9}
 
 <div class="section">
 <h2>Pipeline at Risk — By Deal Owner</h2>
-<div class="bar-row"><span class="name"><b>Daniel Wilkinson</b></span><div class="bar-wrap"><div class="bar" style="width:100%;background:linear-gradient(90deg,#1565C0 70%,#C62828 100%)">14 deals</div></div><span class="amt">$2,180,000</span><span class="meta">max 7×</span></div>
-<div class="bar-row"><span class="name"><b>Mary D'Angelo</b></span><div class="bar-wrap"><div class="bar" style="width:69%;background:linear-gradient(90deg,#1565C0 85%,#FFA000 100%)">11 deals</div></div><span class="amt">$1,510,000</span><span class="meta">max 4×</span></div>
-<div class="bar-row"><span class="name"><b>Michael Mammele Jr.</b></span><div class="bar-wrap"><div class="bar" style="width:45%;background:linear-gradient(90deg,#1565C0 55%,#C62828 100%)">6 deals</div></div><span class="amt">$980,000</span><span class="meta">max 7×</span></div>
-<div class="bar-row"><span class="name"><b>Teresa Gardner</b></span><div class="bar-wrap"><div class="bar" style="width:29%;background:#1565C0">3 deals</div></div><span class="amt">$640,000</span><span class="meta">max 4×</span></div>
-<div class="bar-row"><span class="name"><b>Christine Adams</b></span><div class="bar-wrap"><div class="bar" style="width:29%;background:linear-gradient(90deg,#1565C0 60%,#E65100 100%)">5 deals</div></div><span class="amt">$630,286</span><span class="meta">max 6×</span></div>
-<div class="bar-row"><span class="name"><b>Andrea Assara</b></span><div class="bar-wrap"><div class="bar" style="width:25%;background:linear-gradient(90deg,#1565C0 60%,#E65100 100%)">3 deals</div></div><span class="amt">$550,000</span><span class="meta">max 5×</span></div>
-<div class="bar-row"><span class="name"><b>Colleen Durocher</b></span><div class="bar-wrap"><div class="bar" style="width:14%;background:#1565C0">1 deal</div></div><span class="amt">$309,249</span><span class="meta">max 2×</span></div>
-<div class="bar-row"><span class="name"><b>Robert Lynch</b></span><div class="bar-wrap"><div class="bar" style="width:9%;background:#FFA000">1 deal</div></div><span class="amt">$200,000</span><span class="meta">max 4×</span></div>
-<div class="bar-row"><span class="name"><b>Katherine Andrews</b></span><div class="bar-wrap"><div class="bar" style="width:5%;background:#FFA000">1 deal</div></div><span class="amt">$100,000</span><span class="meta">max 3×</span></div>
+<div class="bar-row"><span class="name"><b>Daniel Wilkinson</b></span><div class="bar-wrap"><div class="bar" style="width:100%;background:linear-gradient(90deg,#1565C0 70%,#C62828 100%)">14 deals</div></div><span class="amt">$2,180,000</span><span class="meta">max 7x</span></div>
+<div class="bar-row"><span class="name"><b>Mary D'Angelo</b></span><div class="bar-wrap"><div class="bar" style="width:69%;background:linear-gradient(90deg,#1565C0 85%,#FFA000 100%)">11 deals</div></div><span class="amt">$1,510,000</span><span class="meta">max 4x</span></div>
+<div class="bar-row"><span class="name"><b>Michael Mammele Jr.</b></span><div class="bar-wrap"><div class="bar" style="width:45%;background:linear-gradient(90deg,#1565C0 55%,#C62828 100%)">6 deals</div></div><span class="amt">$980,000</span><span class="meta">max 7x</span></div>
+<div class="bar-row"><span class="name"><b>Teresa Gardner</b></span><div class="bar-wrap"><div class="bar" style="width:29%;background:#1565C0">3 deals</div></div><span class="amt">$640,000</span><span class="meta">max 4x</span></div>
+<div class="bar-row"><span class="name"><b>Christine Adams</b></span><div class="bar-wrap"><div class="bar" style="width:29%;background:linear-gradient(90deg,#1565C0 60%,#E65100 100%)">5 deals</div></div><span class="amt">$630,286</span><span class="meta">max 6x</span></div>
+<div class="bar-row"><span class="name"><b>Andrea Assara</b></span><div class="bar-wrap"><div class="bar" style="width:25%;background:linear-gradient(90deg,#1565C0 60%,#E65100 100%)">3 deals</div></div><span class="amt">$550,000</span><span class="meta">max 5x</span></div>
+<div class="bar-row"><span class="name"><b>Colleen Durocher</b></span><div class="bar-wrap"><div class="bar" style="width:14%;background:#1565C0">1 deal</div></div><span class="amt">$309,249</span><span class="meta">max 2x</span></div>
+<div class="bar-row"><span class="name"><b>Robert Lynch</b></span><div class="bar-wrap"><div class="bar" style="width:9%;background:#FFA000">1 deal</div></div><span class="amt">$200,000</span><span class="meta">max 4x</span></div>
+<div class="bar-row"><span class="name"><b>Katherine Andrews</b></span><div class="bar-wrap"><div class="bar" style="width:5%;background:#FFA000">1 deal</div></div><span class="amt">$100,000</span><span class="meta">max 3x</span></div>
 </div>
 
 <div class="section">
-<h2>Critical & High Severity — Immediate CRO Review Required</h2>
+<h2>Critical & High Severity — Immediate CRO Review</h2>
 <table>
-<tr><th>Deal Name</th><th>Amount</th><th>Pushes</th><th>Tier</th><th>Owner</th><th>From → To</th><th>Close Date</th></tr>
+<tr><th>Deal Name</th><th>Amount</th><th>Pushes</th><th>Tier</th><th>Owner</th><th>From / To</th><th>Close Date</th></tr>
 <tr><td>[Equitable] OpenCTI EE SaaS M</td><td>$180,000</td><td>7</td><td><span class="badge crit">CRITICAL</span></td><td>Daniel Wilkinson</td><td>Q3→Q4 '26</td><td>Oct 30, 2026</td></tr>
 <tr><td>[Liberty Mutual] OpenCTI EE SaaS M</td><td>$160,000</td><td>7</td><td><span class="badge crit">CRITICAL</span></td><td>Michael Mammele Jr.</td><td>Q4 '25→Q1 '26</td><td><b>Closed Lost</b></td></tr>
 <tr><td>[DTCC] OpenCTI | Saas Medium</td><td>$100,000</td><td>6</td><td><span class="badge high">HIGH</span></td><td>Christine Adams</td><td>Q3→Q4 '26</td><td>Dec 31, 2026</td></tr>
@@ -88,32 +131,94 @@ tr:nth-child(even){background:#f9f9f9}
 <tr><td>United Wholesale Mortgage</td><td>$150,000</td><td>4</td><td>Michael Mammele Jr.</td><td>Dec 31, 2026</td></tr>
 <tr><td>[U.S. Cyber Command] Ghostcrew - Sixgen</td><td>$150,000</td><td>4</td><td>Teresa Gardner</td><td>Sep 30, 2026</td></tr>
 <tr><td>[Metro] | OpenCTI | SaaS Large</td><td>$150,000</td><td>3</td><td>Daniel Wilkinson</td><td>Oct 30, 2026</td></tr>
-<tr><td>[AtkinsRealis] OpenCTI EE | SaaS Medium</td><td>$100,000</td><td>3</td><td>Christine Adams</td><td>Sep 30, 2026</td></tr>
 <tr><td>[CIRA] OpenCTI - Enterprise Edition</td><td>$100,000</td><td>4</td><td>Daniel Wilkinson</td><td>Oct 30, 2026</td></tr>
-<tr><td>[KPMG Canada] | OCTI SaaS Med | Prem Supp</td><td>$100,000</td><td>4</td><td>Daniel Wilkinson</td><td>Oct 30, 2026</td></tr>
-<tr><td>[Truist] OpenCTI - Enterprise Edition</td><td>$100,000</td><td>3</td><td>Mary D'Angelo</td><td><i>Closed Won ✓</i></td></tr>
+<tr><td>[KPMG Canada] | OCTI SaaS Med</td><td>$100,000</td><td>4</td><td>Daniel Wilkinson</td><td>Oct 30, 2026</td></tr>
+<tr><td>[AtkinsRealis] OpenCTI EE | SaaS Medium</td><td>$100,000</td><td>3</td><td>Christine Adams</td><td>Sep 30, 2026</td></tr>
+<tr><td>[Truist] OpenCTI - Enterprise Edition</td><td>$100,000</td><td>3</td><td>Mary D'Angelo</td><td><i>Closed Won</i></td></tr>
 <tr><td>[VIZIO] OpenCTI - SaaS Large</td><td>$100,000</td><td>3</td><td>Katherine Andrews</td><td>Oct 30, 2026</td></tr>
-<tr><td>[Tucson Electric] OpenCTI - SaaS Medium</td><td>$85,000</td><td>4</td><td>Mary D'Angelo</td><td><i>Closed Won ✓</i></td></tr>
+<tr><td>[Tucson Electric] OpenCTI - SaaS Medium</td><td>$85,000</td><td>4</td><td>Mary D'Angelo</td><td><i>Closed Won</i></td></tr>
 </table>
 </div>
 
 <div class="flag-box">
-<h3>⚠️ Deal/Account Owner Change Tracking</h3>
-<p>HubSpot's <code>hubspot_owner_id</code> reflects the <strong>current</strong> deal owner only. To identify ownership transfers during Q1 2025–Q2 2026, the <code>propertiesWithHistory</code> API must be called per deal for the <code>hubspot_owner_id</code> field — the same method used for close date history. <strong>This was not run in this pull.</strong> Deals with mid-cycle owner changes may have push attribution that spans two reps. To run this: enroll all 172 NA pushed deals in a batch API call fetching <code>hubspot_owner_id</code> history, then cross-reference the ownership change date against the push dates to flag split-attribution deals. <strong>[TBD: requires additional API run]</strong></p>
+<h3>Owner Change Tracking — [TBD]</h3>
+<p>Current data reflects <b>current</b> deal owner only. Historical ownership transfers require a separate <code>propertiesWithHistory</code> API batch job on <code>hubspot_owner_id</code> for all 172 deals. Not yet executed. Deals with mid-push-cycle owner changes may have split attribution across reps.</p>
 </div>
 
+<div class="footer">
+SWELL GTM x Filigran | NA Pipeline Slippage Intelligence | Data source: HubSpot Sales Hub Enterprise (live pull March 27, 2026)<br>
+Dashboard compiled by Claude for Romain Francia | Confidential — do not distribute without authorization
+</div>
+
+</div><!-- /dashboard -->
+
 <script>
-const tC='#555';
-new Chart(document.getElementById('ownerChart'),{type:'bar',
-  data:{labels:['Wilkinson','D\'Angelo','Mammele','Gardner','Adams','Assara','Durocher','Lynch','Andrews'],
-    datasets:[{label:'Amount ($)',data:[2180000,1510000,980000,640000,630286,550000,309249,200000,100000],backgroundColor:['#C62828','#FFA000','#C62828','#1565C0','#E65100','#E65100','#1565C0','#FFA000','#FFA000'],borderRadius:4}]},
-  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'Pipeline at Risk by Owner (USD)',color:tC,font:{size:13,weight:600}}},
-    scales:{x:{grid:{color:'#eee'},ticks:{color:tC,callback:v=>'$'+(v/1000000).toFixed(1)+'M'}},y:{grid:{display:false},ticks:{color:tC,font:{size:10}}}}}
-});
-new Chart(document.getElementById('severityChart'),{type:'doughnut',
-  data:{labels:['Critical 7× ($340K)','High 5-6× ($845K)','Medium 3-4× ($2.24M)','Low 1-2× ($3.67M)'],
-    datasets:[{data:[340000,845000,2235000,3679535],backgroundColor:['#C62828','#E65100','#FFA000','#90A4AE'],borderWidth:0}]},
-  options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom',labels:{color:tC,font:{size:10},boxWidth:10,padding:8}},title:{display:true,text:'Distribution by Severity Tier',color:tC,font:{size:13,weight:600}}}}
-});
+/*
+ * PASSWORD GATE
+ * The hash is SHA-256 of the password. To change the password:
+ *   1. Open browser console
+ *   2. Run: crypto.subtle.digest('SHA-256', new TextEncoder().encode('YOUR_NEW_PASSWORD')).then(h => console.log([...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join('')))
+ *   3. Replace the hash below
+ *
+ * Current password: filigran2026
+ */
+// Password hash is stored in EXPECTED below
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Pre-computed hash for "filigran2026"
+const EXPECTED = 'cdc66a378f8e2a08461e27434f4bd8c9869834ac5b6cd82857db8db99c47a22a';
+
+async function tryAccess() {
+  const input = document.getElementById('pwd').value;
+  const hash = await sha256(input);
+  if (hash === EXPECTED) {
+    document.getElementById('gate').classList.add('hidden');
+    document.getElementById('dashboard').classList.add('visible');
+    setTimeout(() => { document.getElementById('gate').style.display = 'none'; initCharts(); }, 400);
+  } else {
+    document.getElementById('err').textContent = 'Invalid access code';
+    document.getElementById('pwd').value = '';
+    document.getElementById('pwd').focus();
+  }
+}
+
+document.getElementById('pwd').addEventListener('keydown', e => { if (e.key === 'Enter') tryAccess(); });
+
+function initCharts() {
+  const tC = '#555';
+  new Chart(document.getElementById('ownerChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Wilkinson', "D'Angelo", 'Mammele', 'Gardner', 'Adams', 'Assara', 'Durocher', 'Lynch', 'Andrews'],
+      datasets: [{
+        label: 'Amount ($)',
+        data: [2180000, 1510000, 980000, 640000, 630286, 550000, 309249, 200000, 100000],
+        backgroundColor: ['#C62828','#FFA000','#C62828','#1565C0','#E65100','#E65100','#1565C0','#FFA000','#FFA000'],
+        borderRadius: 4
+      }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, title: { display: true, text: 'Pipeline at Risk by Owner (USD)', color: tC, font: { size: 13, weight: 600 } } },
+      scales: { x: { grid: { color: '#eee' }, ticks: { color: tC, callback: v => '$' + (v/1e6).toFixed(1) + 'M' } }, y: { grid: { display: false }, ticks: { color: tC, font: { size: 10 } } } }
+    }
+  });
+
+  new Chart(document.getElementById('severityChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Critical 7x ($340K)', 'High 5-6x ($845K)', 'Medium 3-4x ($2.24M)', 'Low 1-2x ($3.67M)'],
+      datasets: [{ data: [340000, 845000, 2235000, 3679535], backgroundColor: ['#C62828','#E65100','#FFA000','#90A4AE'], borderWidth: 0 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '55%',
+      plugins: { legend: { position: 'bottom', labels: { color: tC, font: { size: 10 }, boxWidth: 10, padding: 8 } }, title: { display: true, text: 'Distribution by Severity Tier', color: tC, font: { size: 13, weight: 600 } } }
+    }
+  });
+}
 </script>
 </body></html>
