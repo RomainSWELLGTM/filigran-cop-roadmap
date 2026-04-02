@@ -1,1 +1,119 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>NA Deal Slippage Intelligence</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,sans-serif;background:#fff;color:#1a1a1a;padding:20px;max-width:1100px;margin:0 auto}
+h1{font-size:22px;font-weight:700;margin-bottom:4px}
+.sub{font-size:12px;color:#888;margin-bottom:20px}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.kpi{background:#f5f5f5;border-radius:10px;padding:14px;text-align:center}
+.kpi .label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#888;font-weight:600}
+.kpi .val{font-size:24px;font-weight:700;margin:4px 0}
+.kpi .detail{font-size:10px;color:#aaa}
+.kpi.red .val{color:#C62828}.kpi.amber .val{color:#E65100}.kpi.blue .val{color:#1565C0}
+.section{margin-bottom:24px}
+.section h2{font-size:15px;font-weight:600;margin-bottom:10px;padding-bottom:4px;border-bottom:2px solid #e0e0e0}
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.chart-box{position:relative;height:280px;background:#f9f9f9;border-radius:8px;padding:12px}
+table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:12px}
+th{background:#0D1B2A;color:#fff;padding:7px 8px;text-align:left;font-weight:600;font-size:10px}
+td{padding:5px 8px;border-bottom:1px solid #eee}
+tr:nth-child(even){background:#f9f9f9}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-weight:700;font-size:10px;color:#fff}
+.badge.crit{background:#C62828}.badge.high{background:#E65100}.badge.med{background:#FFA000}.badge.low{background:#90A4AE}
+.bar-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #eee;font-size:11px}
+.bar-row .name{width:150px;font-weight:500;flex-shrink:0}
+.bar-row .bar-wrap{flex:1;height:20px;background:#eee;border-radius:4px;overflow:hidden}
+.bar-row .bar{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:6px;font-size:9px;color:#fff;font-weight:600}
+.bar-row .amt{width:100px;text-align:right;font-weight:600;flex-shrink:0}
+.bar-row .meta{width:60px;text-align:center;font-size:10px;color:#888;flex-shrink:0}
+.flag-box{background:#FFF3E0;border-radius:8px;padding:14px;margin-top:16px;border-left:4px solid #E65100}
+.flag-box h3{font-size:13px;margin-bottom:6px;color:#E65100}
+.flag-box p{font-size:11px;color:#555;line-height:1.5}
+</style></head><body>
 
+<h1>NA Deal Slippage Intelligence</h1>
+<div class="sub">Q1 2025 → Q2 2026 | HubSpot Team: Revenue - NA | 172 pushed deals total | Live data pulled March 27, 2026</div>
+
+<div class="kpi-grid">
+  <div class="kpi blue"><div class="label">Total Pushed Deals</div><div class="val">172</div><div class="detail">deal_was_pushed = true (NA)</div></div>
+  <div class="kpi"><div class="label">Serial Pushed (2+)</div><div class="val">$7.1M</div><div class="detail">45 deals with detailed data</div></div>
+  <div class="kpi red"><div class="label">Critical + High</div><div class="val">8 deals</div><div class="detail">$1.19M pushed 5-7×</div></div>
+  <div class="kpi amber"><div class="label">Avg Push (serial)</div><div class="val">3.6×</div><div class="detail">benchmark max: 1×</div></div>
+</div>
+
+<div class="chart-row">
+  <div class="chart-box"><canvas id="ownerChart"></canvas></div>
+  <div class="chart-box"><canvas id="severityChart"></canvas></div>
+</div>
+
+<div class="section">
+<h2>Pipeline at Risk — By Deal Owner</h2>
+<div class="bar-row"><span class="name"><b>Daniel Wilkinson</b></span><div class="bar-wrap"><div class="bar" style="width:100%;background:linear-gradient(90deg,#1565C0 70%,#C62828 100%)">14 deals</div></div><span class="amt">$2,180,000</span><span class="meta">max 7×</span></div>
+<div class="bar-row"><span class="name"><b>Mary D'Angelo</b></span><div class="bar-wrap"><div class="bar" style="width:69%;background:linear-gradient(90deg,#1565C0 85%,#FFA000 100%)">11 deals</div></div><span class="amt">$1,510,000</span><span class="meta">max 4×</span></div>
+<div class="bar-row"><span class="name"><b>Michael Mammele Jr.</b></span><div class="bar-wrap"><div class="bar" style="width:45%;background:linear-gradient(90deg,#1565C0 55%,#C62828 100%)">6 deals</div></div><span class="amt">$980,000</span><span class="meta">max 7×</span></div>
+<div class="bar-row"><span class="name"><b>Teresa Gardner</b></span><div class="bar-wrap"><div class="bar" style="width:29%;background:#1565C0">3 deals</div></div><span class="amt">$640,000</span><span class="meta">max 4×</span></div>
+<div class="bar-row"><span class="name"><b>Christine Adams</b></span><div class="bar-wrap"><div class="bar" style="width:29%;background:linear-gradient(90deg,#1565C0 60%,#E65100 100%)">5 deals</div></div><span class="amt">$630,286</span><span class="meta">max 6×</span></div>
+<div class="bar-row"><span class="name"><b>Andrea Assara</b></span><div class="bar-wrap"><div class="bar" style="width:25%;background:linear-gradient(90deg,#1565C0 60%,#E65100 100%)">3 deals</div></div><span class="amt">$550,000</span><span class="meta">max 5×</span></div>
+<div class="bar-row"><span class="name"><b>Colleen Durocher</b></span><div class="bar-wrap"><div class="bar" style="width:14%;background:#1565C0">1 deal</div></div><span class="amt">$309,249</span><span class="meta">max 2×</span></div>
+<div class="bar-row"><span class="name"><b>Robert Lynch</b></span><div class="bar-wrap"><div class="bar" style="width:9%;background:#FFA000">1 deal</div></div><span class="amt">$200,000</span><span class="meta">max 4×</span></div>
+<div class="bar-row"><span class="name"><b>Katherine Andrews</b></span><div class="bar-wrap"><div class="bar" style="width:5%;background:#FFA000">1 deal</div></div><span class="amt">$100,000</span><span class="meta">max 3×</span></div>
+</div>
+
+<div class="section">
+<h2>Critical & High Severity — Immediate CRO Review Required</h2>
+<table>
+<tr><th>Deal Name</th><th>Amount</th><th>Pushes</th><th>Tier</th><th>Owner</th><th>From → To</th><th>Close Date</th></tr>
+<tr><td>[Equitable] OpenCTI EE SaaS M</td><td>$180,000</td><td>7</td><td><span class="badge crit">CRITICAL</span></td><td>Daniel Wilkinson</td><td>Q3→Q4 '26</td><td>Oct 30, 2026</td></tr>
+<tr><td>[Liberty Mutual] OpenCTI EE SaaS M</td><td>$160,000</td><td>7</td><td><span class="badge crit">CRITICAL</span></td><td>Michael Mammele Jr.</td><td>Q4 '25→Q1 '26</td><td><b>Closed Lost</b></td></tr>
+<tr><td>[DTCC] OpenCTI | Saas Medium</td><td>$100,000</td><td>6</td><td><span class="badge high">HIGH</span></td><td>Christine Adams</td><td>Q3→Q4 '26</td><td>Dec 31, 2026</td></tr>
+<tr><td>[Elastic] OpenCTI EE | SaaS Large</td><td>$180,000</td><td>5</td><td><span class="badge high">HIGH</span></td><td>Daniel Wilkinson</td><td>Q2→Q4 '26</td><td>Oct 1, 2026</td></tr>
+<tr><td>[NY State Police] OpenCTI - SaaS Medium</td><td>$150,000</td><td>5</td><td><span class="badge high">HIGH</span></td><td>Andrea Assara</td><td>Q2→Q4 '26</td><td>Oct 30, 2026</td></tr>
+<tr><td>Huntington Bank (RFP) - OpenCTI</td><td>$250,000</td><td>5</td><td><span class="badge high">HIGH</span></td><td>Michael Mammele Jr.</td><td>Q2→Q3 '26</td><td>Sep 30, 2026</td></tr>
+<tr><td>Western Governors Univ - OCTI SaaS Medium</td><td>$100,000</td><td>5</td><td><span class="badge high">HIGH</span></td><td>Daniel Wilkinson</td><td>Q2→Q4 '26</td><td>Oct 1, 2026</td></tr>
+<tr><td>[WealthSimple] | OpenCTI EE | SaaS Medium</td><td>$65,000</td><td>5</td><td><span class="badge high">HIGH</span></td><td>Christine Adams</td><td>Q2→Q3 '26</td><td>Aug 31, 2026</td></tr>
+</table>
+</div>
+
+<div class="section">
+<h2>Medium Severity (3-4 pushes) — Weekly Forecast Review</h2>
+<table>
+<tr><th>Deal Name</th><th>Amount</th><th>Pushes</th><th>Owner</th><th>Close Date</th></tr>
+<tr><td>[Ontario Health] OpenCTI EE | SaaS Medium</td><td>$300,000</td><td>4</td><td>Daniel Wilkinson</td><td>Jul 1, 2026</td></tr>
+<tr><td>[J&J] OpenCTI - Enterprise Edition</td><td>$300,000</td><td>3</td><td>Christine Adams</td><td>Dec 31, 2026</td></tr>
+<tr><td>[State of Oklahoma] OpenCTI EE | Large SaaS</td><td>$240,000</td><td>3</td><td>Mary D'Angelo</td><td>Nov 30, 2026</td></tr>
+<tr><td>Cargill - OpenCTI EE</td><td>$200,000</td><td>4</td><td>Robert Lynch</td><td>Sep 30, 2026</td></tr>
+<tr><td>[Global Payments] OpenCTI - SaaS Medium</td><td>$160,000</td><td>3</td><td>Mary D'Angelo</td><td><i>Closed Lost</i></td></tr>
+<tr><td>United Wholesale Mortgage</td><td>$150,000</td><td>4</td><td>Michael Mammele Jr.</td><td>Dec 31, 2026</td></tr>
+<tr><td>[U.S. Cyber Command] Ghostcrew - Sixgen</td><td>$150,000</td><td>4</td><td>Teresa Gardner</td><td>Sep 30, 2026</td></tr>
+<tr><td>[Metro] | OpenCTI | SaaS Large</td><td>$150,000</td><td>3</td><td>Daniel Wilkinson</td><td>Oct 30, 2026</td></tr>
+<tr><td>[AtkinsRealis] OpenCTI EE | SaaS Medium</td><td>$100,000</td><td>3</td><td>Christine Adams</td><td>Sep 30, 2026</td></tr>
+<tr><td>[CIRA] OpenCTI - Enterprise Edition</td><td>$100,000</td><td>4</td><td>Daniel Wilkinson</td><td>Oct 30, 2026</td></tr>
+<tr><td>[KPMG Canada] | OCTI SaaS Med | Prem Supp</td><td>$100,000</td><td>4</td><td>Daniel Wilkinson</td><td>Oct 30, 2026</td></tr>
+<tr><td>[Truist] OpenCTI - Enterprise Edition</td><td>$100,000</td><td>3</td><td>Mary D'Angelo</td><td><i>Closed Won ✓</i></td></tr>
+<tr><td>[VIZIO] OpenCTI - SaaS Large</td><td>$100,000</td><td>3</td><td>Katherine Andrews</td><td>Oct 30, 2026</td></tr>
+<tr><td>[Tucson Electric] OpenCTI - SaaS Medium</td><td>$85,000</td><td>4</td><td>Mary D'Angelo</td><td><i>Closed Won ✓</i></td></tr>
+</table>
+</div>
+
+<div class="flag-box">
+<h3>⚠️ Deal/Account Owner Change Tracking</h3>
+<p>HubSpot's <code>hubspot_owner_id</code> reflects the <strong>current</strong> deal owner only. To identify ownership transfers during Q1 2025–Q2 2026, the <code>propertiesWithHistory</code> API must be called per deal for the <code>hubspot_owner_id</code> field — the same method used for close date history. <strong>This was not run in this pull.</strong> Deals with mid-cycle owner changes may have push attribution that spans two reps. To run this: enroll all 172 NA pushed deals in a batch API call fetching <code>hubspot_owner_id</code> history, then cross-reference the ownership change date against the push dates to flag split-attribution deals. <strong>[TBD: requires additional API run]</strong></p>
+</div>
+
+<script>
+const tC='#555';
+new Chart(document.getElementById('ownerChart'),{type:'bar',
+  data:{labels:['Wilkinson','D\'Angelo','Mammele','Gardner','Adams','Assara','Durocher','Lynch','Andrews'],
+    datasets:[{label:'Amount ($)',data:[2180000,1510000,980000,640000,630286,550000,309249,200000,100000],backgroundColor:['#C62828','#FFA000','#C62828','#1565C0','#E65100','#E65100','#1565C0','#FFA000','#FFA000'],borderRadius:4}]},
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'Pipeline at Risk by Owner (USD)',color:tC,font:{size:13,weight:600}}},
+    scales:{x:{grid:{color:'#eee'},ticks:{color:tC,callback:v=>'$'+(v/1000000).toFixed(1)+'M'}},y:{grid:{display:false},ticks:{color:tC,font:{size:10}}}}}
+});
+new Chart(document.getElementById('severityChart'),{type:'doughnut',
+  data:{labels:['Critical 7× ($340K)','High 5-6× ($845K)','Medium 3-4× ($2.24M)','Low 1-2× ($3.67M)'],
+    datasets:[{data:[340000,845000,2235000,3679535],backgroundColor:['#C62828','#E65100','#FFA000','#90A4AE'],borderWidth:0}]},
+  options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom',labels:{color:tC,font:{size:10},boxWidth:10,padding:8}},title:{display:true,text:'Distribution by Severity Tier',color:tC,font:{size:13,weight:600}}}}
+});
+</script>
+</body></html>
